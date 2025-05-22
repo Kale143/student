@@ -53,7 +53,8 @@ jobs:
             pip install -r requirements.txt
 
             # Run Django commands
-            ./env/bin/python manage.py migrate
+            python manage.py migrate
+            python manage.py runserver 0.0.0.0:8000
             # ./env/bin/python manage.py collectstatic --noinput  # Uncomment if needed
 
             # Optional: Restart services if used
