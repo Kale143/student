@@ -18,31 +18,23 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        working-directory: student/student_project_django-main/Student_project
         run: |
           python -m venv env
           source env/bin/activate
           pip install --upgrade pip
-          pip install -r ../requirements.txt
+          pip install -r student_project_django-main/requirements.txt
 
       - name: Run migrations
-        working-directory: student/student_project_django-main/Student_project
         run: |
           source env/bin/activate
+          cd student_project_django-main/Student_project
           python manage.py migrate
 
       - name: Collect static files
-        working-directory: student/student_project_django-main/Student_project
         run: |
           source env/bin/activate
+          cd student_project_django-main/Student_project
           python manage.py collectstatic --noinput
-
-      # Optional: Add a test step if you have tests
-      # - name: Run tests
-      #   working-directory: student/student_project_django-main/Student_project
-      #   run: |
-      #     source env/bin/activate
-      #     python manage.py test
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -59,4 +51,5 @@ jobs:
             python manage.py collectstatic --noinput
             sudo systemctl restart gunicorn
             sudo systemctl reload nginx
+
 
