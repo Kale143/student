@@ -31,7 +31,6 @@ jobs:
           cd student_project_django-main/Student_project
           python manage.py migrate
 
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -41,24 +40,24 @@ jobs:
           script: |
             cd /home/ubuntu/student/student_project_django-main/Student_project
 
-# Install venv if not already
+            # Install venv if not already
             sudo apt-get update
             sudo apt-get install -y python3-venv
 
-# Create venv if not exists
+            # Create venv if not exists
             [ ! -d env ] && python3 -m venv env
-# Activate venv and install dependencies
-           source env/bin/activate
-           pip install --upgrade pip
-           pip install -r ../requirements.txt
 
-# Run Django commands
-           ./env/bin/python manage.py migrate
-# ./env/bin/python manage.py collectstatic --noinput  # Uncomment if needed
+            # Activate venv and install dependencies
+            source env/bin/activate
+            pip install --upgrade pip
+            pip install -r ../requirements.txt
 
-# Optional: Restart services if used
-# sudo systemctl restart gunicorn
-# sudo systemctl reload nginx
+            # Run Django commands
+            ./env/bin/python manage.py migrate
+            # ./env/bin/python manage.py collectstatic --noinput  # Uncomment if needed
 
+            # Optional: Restart services if used
+            # sudo systemctl restart gunicorn
+            # sudo systemctl reload nginx
 
 
