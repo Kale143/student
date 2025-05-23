@@ -80,7 +80,7 @@ This repository contains a Django implementation for managing various aspects of
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License..
 
 ## Acknowledgements
 
