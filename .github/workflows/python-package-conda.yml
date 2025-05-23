@@ -25,7 +25,7 @@ jobs:
           pip install django-countries
           pip install -r student_project_django-main/Student_project/requirements.txt
 
-      - name: Run migrations
+      - name: Run migrations locally (optional)
         run: |
           source env/bin/activate
           cd student_project_django-main/Student_project
@@ -38,17 +38,39 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/student/student_project_django-main/Student_project
+            cd /home/ubuntu/student/student_project_django-main
 
-            # Install venv if not already
+            # Update packages and install python3-venv if missing
             sudo apt-get update
             sudo apt-get install -y python3-venv
 
-            # Create venv if not exists
+            # Create virtualenv if it doesn't exist
             [ ! -d env ] && python3 -m venv env
 
             source env/bin/activate
+
+            # Pull latest changes
+            git pull origin main
+
+            # Install dependencies
             pip install django-countries
-            pip install -r requirements.txt
-            python manage.py migrate
-            python manage.py runserver 0.0.0.0:8000
+            pip install -r Student_project/requirements.txt
+
+            # Run migrations and collectstatic
+            cd Student_project
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput
+
+            # Kill existing gunicorn processes
+            pkill gunicorn || true
+
+            # Start Gunicorn in background
+            nohup gunicorn --workers 3 --bind unix:/tmp/gunicorn.sock Student_project.wsgi:application > gunicorn.log 2>&1 &
+
+            # Adjust socket permissions for nginx (assuming nginx runs as www-data)
+            sudo chown www-data:www-data /tmp/gunicorn.sock
+            sudo chmod 660 /tmp/gunicorn.sock
+
+            # Restart nginx
+            sudo systemctl restart nginx
+
